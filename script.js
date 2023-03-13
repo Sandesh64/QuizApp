@@ -1,60 +1,45 @@
-function calcScore(){
-    var q1 = document.forms["quiz"]["ans1"].value;
-    var q2 = document.forms["quiz"]["ans2"].value;
-    var q3 = document.forms["quiz"]["ans3"].value;
-    var q4 = document.forms["quiz"]["ans4"].value;
-    var q5 = document.forms["quiz"]["ans5"].value;
-  
-    var a1 = 2;
-    var a2 = 2;
-    var a3 = 2;
-    var a4 = 2;
-    var a5 = 2;
-  
-    if(q1==a1)
-    {
-      var s1 = 1;
-    }
-    else {
-      var s1 = 0;
-    }
-  
-    if(q2==a2)
-    {
-      var s2 = 1;
-    }
-    else {
-      var s2 = 0;
-    }
-  
-    if(q3==a3)
-    {
-      var s3 = 1;
-    }
-    else {
-      var s3 = 0;
-    }
-  
-    if(q4==a4)
-    {
-      var s4 = 1;
-    }
-    else {
-      var s4 = 0;
-    }
-  
-    if(q5==a5)
-    {
-      var s5 = 1;
-    }
-    else {
-      var s5 = 0;
-    }
-  function myFunction() {
-    alert("Hello! I am an alert box!");
+const questions = document.getElementById("questions");
+const btn = document.getElementById("btn");
+const scoreEl = document.getElementById("score");
+var data;
+
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = (e) => {
+  let result = e.target;
+
+  if (result.readyState === 4 && result.status === 200) {
+    data = JSON.parse(result.response);
+    renderQuestions();
+  } else {
+    // console.warn("Something is wrong, try again");
   }
-    var ts = s1 + s2 + s3 + s4 + s5;
-  
-  document.getElementById("qzs").innerHTML = ts;
-  
+};
+xhttp.open("GET", "https://5d76bf96515d1a0014085cf9.mockapi.io/quiz", true);
+xhttp.send();
+
+function renderQuestions() {
+  let output = "";
+  for (let i = 0; i < data.length; i++) {
+    output += 
+    `<div class="question">
+        <h2>Q${i+1}. ${data[i].question}</h2>
+        <label><input type="radio" id="${1}" name="id${i}">${data[i].options[0]}</label>
+        <label><input type="radio" id="${2}" name="id${i}">${data[i].options[1]}</label>
+        <label><input type="radio" id="${3}" name="id${i}">${data[i].options[2]}</label>
+        <label><input type="radio" id="${4}" name="id${i}">${data[i].options[3]}</label>
+    </div>`
   }
+  questions.innerHTML = output;
+}
+
+btn.addEventListener("click", () => {
+  let score = 0;
+  for (let i = 0; i < 5; i++) {
+    let selector = `input[name="id${i}"]:checked`;
+    let selectedOption = +document.querySelector(selector).id;
+    if (selectedOption == data[i].answer) {
+      score++;
+    }
+  }
+  scoreEl.innerHTML = `${score} / 5`;
+});
